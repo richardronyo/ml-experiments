@@ -52,6 +52,38 @@ class LinearRegression:
         self._intercept = current_theta[0]
         self._coef = current_theta[1]
 
+    def fit_minibatchgd(self, X, y, learning_rate = 0.1, num_iterations = 1000, batch_size = 10):
+        #Making sure y is flattened
+        y = y.flatten()
+
+        #Appending a column of 1s to the X for matrix multiplication
+        X_new = np.c_[np.ones(X.shape[0]), X]
+
+        #Initializing a random value for theta
+        current_theta = np.random.rand(X_new.shape[1])
+
+        #Creating an array called thetas to store all the old theta values
+        thetas = np.zeros((num_iterations, X_new.shape[1]))
+
+        for i in range(num_iterations):
+            thetas[i, :] = current_theta
+
+            #Selecting the random rows to make a minibatch
+            idx = np.random.choice(X_new.shape[0], size = batch_size, replace = False) 
+            X_minibatch = X_new[idx]
+            y_minibatch = y[idx]
+
+            #Calculating MSE
+            J = (X_minibatch @ current_theta) - y_minibatch
+
+            #Calculating the Gradient
+            gradients = (1 / batch_size) * (J @ X_minibatch)
+
+            current_theta -= learning_rate * gradients
+
+        self._thetas = thetas
+        self._intercept = current_theta[0]
+        self._coef = current_theta[1]
     def fit_stochasticgd(self, X, y, learning_rate = 0.1, num_iterations = 100):
         m = X.shape[0]
 
@@ -106,5 +138,10 @@ if __name__ == "__main__":
 
     lin_reg.fit_stochasticgd(X, y)
     print("Stochastic Gradient Descent: ")
+    print("\tIntercept: ", lin_reg._intercept)
+    print("\tCoefficient: ", lin_reg._coef)
+
+    lin_reg.fit_minibatchgd(X, y)
+    print("Mini Batch Gradient Descent: ")
     print("\tIntercept: ", lin_reg._intercept)
     print("\tCoefficient: ", lin_reg._coef)
