@@ -23,7 +23,7 @@ class LinearRegression:
         self._intercept = theta[0]
         self._coef = theta[1]
 
-    def fit_gradient_descent(self, X, y, learning_rate = 0.1, num_iterations = 1000):
+    def fit_batchgd(self, X, y, learning_rate = 0.1, num_iterations = 1000):
         #Making sure y is flattened
         y = y.flatten()
 
@@ -51,7 +51,37 @@ class LinearRegression:
         self._thetas = thetas
         self._intercept = current_theta[0]
         self._coef = current_theta[1]
-    
+
+    def fit_stochasticgd(self, X, y, learning_rate = 0.1, num_iterations = 100):
+        m = X.shape[0]
+
+        #Making shure y is flattened
+        y = y.flatten()
+
+        #Appending a column of 1s to X for the bias term
+        X_new = np.c_[np.ones(X.shape[0]), X]
+
+        #Initializing a random value for theta and a 2D array to store all historical theta values
+        current_theta = np.random.rand((X_new.shape[1]))
+        thetas = np.zeros((num_iterations, X_new.shape[1]))
+
+        for i in range(num_iterations):
+            thetas[i, :] = current_theta
+
+            mi = np.random.randint(m)
+            xi = X_new[mi, :]
+            yi = y[mi]
+
+            J = (xi @ current_theta) - yi
+
+            #Calculating the Gradient
+            gradient = J * xi
+
+            current_theta -= learning_rate * gradient
+
+        self._thetas = thetas
+        self._intercept = current_theta[0]
+        self._coef = current_theta[1]
 
 if __name__ == "__main__":
     X = np.random.rand(100, 1)
@@ -69,7 +99,12 @@ if __name__ == "__main__":
     print("\tIntercept: ", lin_reg._intercept)
     print("\tCoefficient: ", lin_reg._coef)
 
-    lin_reg.fit_gradient_descent(X, y)
-    print("Gradient Descent: ")
+    lin_reg.fit_batchgd(X, y)
+    print("Batch Gradient Descent: ")
+    print("\tIntercept: ", lin_reg._intercept)
+    print("\tCoefficient: ", lin_reg._coef)
+
+    lin_reg.fit_stochasticgd(X, y)
+    print("Stochastic Gradient Descent: ")
     print("\tIntercept: ", lin_reg._intercept)
     print("\tCoefficient: ", lin_reg._coef)
