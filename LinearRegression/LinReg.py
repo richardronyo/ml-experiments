@@ -37,12 +37,14 @@ class LinearRegression:
 
             #Creating an array called theta_history to store all the old theta values
             theta_history = np.zeros((num_iterations, X_new.shape[1]))
+            cost_history = np.zeros(num_iterations)
 
             for i in range(num_iterations):
                 theta_history[i, :] = theta
 
                 #Calculating MSE
                 J = (X_new @ theta) - y
+                cost_history[i] = np.mean(J**2)
 
                 #Calculating the Gradient
                 m = X_new.shape[0]
@@ -55,7 +57,7 @@ class LinearRegression:
             theta_history_unscaled[:, 0] = theta_history[:, 0] - np.sum(theta_history[:, 1:] * X_mean / X_std, axis = 1)
 
             self._theta_history = theta_history_unscaled            
-
+            self._cost_history = cost_history
         if type == 'minibatch':
             #Appending a column of 1s to the X for matrix multiplication
             X_new = np.c_[np.ones(X.shape[0]), X]
@@ -65,6 +67,7 @@ class LinearRegression:
 
             #Creating an array called theta_history to store all the old theta values
             theta_history = np.zeros((num_iterations, X_new.shape[1]))
+            cost_history = np.zeros(num_iterations)
 
             for i in range(num_iterations):
                 theta_history[i, :] = theta
@@ -76,7 +79,7 @@ class LinearRegression:
 
                 #Calculating MSE
                 J = (X_minibatch @ theta) - y_minibatch
-
+                cost_history[i] = np.mean(J**2)
                 #Calculating the Gradient
                 gradients = (1 / batch_size) * (J @ X_minibatch)
 
@@ -87,6 +90,7 @@ class LinearRegression:
             theta_history_unscaled[:, 0] = theta_history[:, 0] - np.sum(theta_history[:, 1:] * X_mean / X_std, axis = 1)
 
             self._theta_history = theta_history_unscaled            
+            self._cost_history = cost_history
 
         if type == 'stochastic':
             m = X.shape[0]
@@ -97,6 +101,8 @@ class LinearRegression:
             #Initializing a random value for theta and a 2D array to store all historical theta values
             theta = np.random.rand((X_new.shape[1]))
             theta_history = np.zeros((num_iterations, X_new.shape[1]))
+            print(num_iterations)
+            cost_history = np.zeros(num_iterations)
 
             for i in range(num_iterations):
                 theta_history[i, :] = theta
@@ -106,6 +112,7 @@ class LinearRegression:
                 yi = y[mi]
 
                 J = (xi @ theta) - yi
+                cost_history[i] = J**2
 
                 #Calculating the Gradient
                 gradient = J * xi
@@ -118,6 +125,7 @@ class LinearRegression:
             theta_history_unscaled[:, 0] = theta_history[:, 0] - np.sum(theta_history[:, 1:] * X_mean / X_std, axis = 1)
 
             self._theta_history = theta_history_unscaled            
+            self._cost_history = cost_history
 
         #Unscaling theta values to be stored
         theta_unscaled = np.zeros_like(theta)
