@@ -7,58 +7,67 @@ class LinearRegression:
         self._coef = None
 
     def fit(self, X, y, type = 'normal', learning_rate = 0.1, num_iterations = 1000, batch_size = 10):
+        #Normalizing my X data and flattening my y
+        X_mean, X_std = X.mean(), X.std()
+        X = (X - X_mean) / X_std
         y = y.flatten()
+
+        if len(X.shape) == 1:
+            theta = np.zeros(2)
+        else:
+            theta = np.zeros(X.shape[1] + 1)
 
         if type == 'normal':
             #Appending a column of 1s to the X for matrix multiplication
             X_new = np.c_[np.ones(X.shape[0]), X]
             theta = np.linalg.inv(X_new.T @ X_new) @ X_new.T @ y
 
-            self._theta = theta
         if type == 'pseudoinverse':
             #Appending a column of 1s to the X for matrix multiplication
             X_new = np.c_[np.ones(X.shape[0]), X]
 
             theta = np.linalg.pinv(X_new) @ y
 
-            self._theta = theta
-
         if type == 'batch':
             #Appending a column of 1s to the X for matrix multiplication
             X_new = np.c_[np.ones(X.shape[0]), X]
 
             #Initializing a random value for theta
-            current_theta = np.random.rand(X_new.shape[1])
+            theta = np.random.rand(X_new.shape[1])
 
-            #Creating an array called thetas to store all the old theta values
-            thetas = np.zeros((num_iterations, X_new.shape[1]))
+            #Creating an array called theta_history to store all the old theta values
+            theta_history = np.zeros((num_iterations, X_new.shape[1]))
 
             for i in range(num_iterations):
-                thetas[i, :] = current_theta
+                theta_history[i, :] = theta
 
                 #Calculating MSE
-                J = (X_new @ current_theta) - y
+                J = (X_new @ theta) - y
 
                 #Calculating the Gradient
                 m = X_new.shape[0]
                 gradients = (1 / m) * (J @ X_new)
 
-                current_theta -= learning_rate * gradients
+                theta -= learning_rate * gradients
 
-            self._theta = current_theta
-            self._theta_history = thetas
+            theta_history_unscaled = np.zeros_like(theta_history)
+            theta_history_unscaled[:, 1:] = theta_history[:, 1:] / X_std
+            theta_history_unscaled[:, 0] = theta_history[:, 0] - np.sum(theta_history[:, 1:] * X_mean / X_std, axis = 1)
+
+            self._theta_history = theta_history_unscaled            
+
         if type == 'minibatch':
             #Appending a column of 1s to the X for matrix multiplication
             X_new = np.c_[np.ones(X.shape[0]), X]
 
             #Initializing a random value for theta
-            current_theta = np.random.rand(X_new.shape[1])
+            theta = np.random.rand(X_new.shape[1])
 
-            #Creating an array called thetas to store all the old theta values
-            thetas = np.zeros((num_iterations, X_new.shape[1]))
+            #Creating an array called theta_history to store all the old theta values
+            theta_history = np.zeros((num_iterations, X_new.shape[1]))
 
             for i in range(num_iterations):
-                thetas[i, :] = current_theta
+                theta_history[i, :] = theta
 
                 #Selecting the random rows to make a minibatch
                 idx = np.random.choice(X_new.shape[0], size = batch_size, replace = False) 
@@ -66,15 +75,18 @@ class LinearRegression:
                 y_minibatch = y[idx]
 
                 #Calculating MSE
-                J = (X_minibatch @ current_theta) - y_minibatch
+                J = (X_minibatch @ theta) - y_minibatch
 
                 #Calculating the Gradient
                 gradients = (1 / batch_size) * (J @ X_minibatch)
 
-                current_theta -= learning_rate * gradients
+                theta -= learning_rate * gradients
 
-            self._theta = current_theta
-            self._theta_history = thetas
+            theta_history_unscaled = np.zeros_like(theta_history)
+            theta_history_unscaled[:, 1:] = theta_history[:, 1:] / X_std
+            theta_history_unscaled[:, 0] = theta_history[:, 0] - np.sum(theta_history[:, 1:] * X_mean / X_std, axis = 1)
+
+            self._theta_history = theta_history_unscaled            
 
         if type == 'stochastic':
             m = X.shape[0]
@@ -83,29 +95,41 @@ class LinearRegression:
             X_new = np.c_[np.ones(X.shape[0]), X]
 
             #Initializing a random value for theta and a 2D array to store all historical theta values
-            current_theta = np.random.rand((X_new.shape[1]))
-            thetas = np.zeros((num_iterations, X_new.shape[1]))
+            theta = np.random.rand((X_new.shape[1]))
+            theta_history = np.zeros((num_iterations, X_new.shape[1]))
 
             for i in range(num_iterations):
-                thetas[i, :] = current_theta
+                theta_history[i, :] = theta
 
                 mi = np.random.randint(m)
                 xi = X_new[mi, :]
                 yi = y[mi]
 
-                J = (xi @ current_theta) - yi
+                J = (xi @ theta) - yi
 
                 #Calculating the Gradient
                 gradient = J * xi
 
-                current_theta -= learning_rate * gradient
+                theta -= learning_rate * gradient
 
-            self._theta = current_theta
-            self._theta_history = thetas
+
+            theta_history_unscaled = np.zeros_like(theta_history)
+            theta_history_unscaled[:, 1:] = theta_history[:, 1:] / X_std
+            theta_history_unscaled[:, 0] = theta_history[:, 0] - np.sum(theta_history[:, 1:] * X_mean / X_std, axis = 1)
+
+            self._theta_history = theta_history_unscaled            
+
+        #Unscaling theta values to be stored
+        theta_unscaled = np.zeros_like(theta)
+        theta_unscaled[1:] = theta[1:] / X_std
+        theta_unscaled[0] = theta[0] - np.sum(theta[1:] * X_mean / X_std)
+
+        self._theta = theta_unscaled
 
     def predict(self, X):
+        X = (X - X.mean()) - X.std()
         X_new = np.c_[np.ones(X.shape[0]), X]
-        theta = np.r_[self._intercept, self._coef]
+        theta = self._theta
 
         return X_new @ theta
 
@@ -117,20 +141,20 @@ if __name__ == "__main__":
 
     lin_reg.fit(X, y)
     print("Normal Equation: ")
-    print("\tThetas: ", lin_reg._theta)
+    print("\tTheta: ", lin_reg._theta)
 
     lin_reg.fit(X, y, type = 'pseudoinverse')
     print("Pseudoinverse: ")
-    print("\tThetas: ", lin_reg._theta)
+    print("\tTheta: ", lin_reg._theta)
 
     lin_reg.fit(X, y, type = 'batch')
     print("Batch Gradient Descent: ")
-    print("\tThetas: ", lin_reg._theta)
+    print("\tTheta: ", lin_reg._theta)
 
     lin_reg.fit(X, y, type = 'stochastic')
     print("Stochastic Gradient Descent: ")
-    print("\tThetas: ", lin_reg._theta)
+    print("\tTheta: ", lin_reg._theta)
 
     lin_reg.fit(X, y, type = 'minibatch')
     print("Mini Batch Gradient Descent: ")
-    print("\tThetas: ", lin_reg._theta)
+    print("\tTheta: ", lin_reg._theta)
