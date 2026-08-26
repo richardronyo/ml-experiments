@@ -1,12 +1,22 @@
 import numpy as np
 
 class LinearRegression:
-    def __init__(self):
+    def __init__(self, type = None, degree = None):
         print("Initialized a Linear Regression Model")
         self._theta = None
         self._coef = None
+        self._type = type
+        self._degree = degree
 
     def fit(self, X, y, type = 'normal', learning_rate = 0.1, num_iterations = 1000, batch_size = 10):
+        #If the user requests a Polynomial Regression
+        if self._type == 'polynomial':
+            #This means that the user only uploaded a 1D vector for X, will add the columns
+            degree = self._degree
+            X = X.flatten()
+            X_poly = np.column_stack([X**i for i in range(1, degree + 1)])
+            X = X_poly
+
         #Normalizing my X data and flattening my y
         X_mean, X_std = X.mean(), X.std()
         X = (X - X_mean) / X_std
@@ -101,7 +111,6 @@ class LinearRegression:
             #Initializing a random value for theta and a 2D array to store all historical theta values
             theta = np.random.rand((X_new.shape[1]))
             theta_history = np.zeros((num_iterations, X_new.shape[1]))
-            print(num_iterations)
             cost_history = np.zeros(num_iterations)
 
             for i in range(num_iterations):
@@ -134,7 +143,14 @@ class LinearRegression:
 
         self._theta = theta_unscaled
 
-    def predict(self, X):
+    def predict(self, X): 
+        if self._type == 'polynomial':
+            #This means that the user only uploaded a 1D vector for X, will add the columns
+            degree = self._degree
+            X = X.flatten()
+            X_poly = np.column_stack([X**i for i in range(1, degree + 1)])
+            X = X_poly
+
         X = (X - X.mean()) - X.std()
         X_new = np.c_[np.ones(X.shape[0]), X]
         theta = self._theta
