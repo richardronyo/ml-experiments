@@ -13,11 +13,6 @@ class LinearRegression:
         X = (X - X_mean) / X_std
         y = y.flatten()
 
-        if len(X.shape) == 1:
-            theta = np.zeros(2)
-        else:
-            theta = np.zeros(X.shape[1] + 1)
-
         if type == 'normal':
             #Appending a column of 1s to the X for matrix multiplication
             X_new = np.c_[np.ones(X.shape[0]), X]
