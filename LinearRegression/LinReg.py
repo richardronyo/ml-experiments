@@ -1,22 +1,13 @@
 import numpy as np
 
 class LinearRegression:
-    def __init__(self, type = None, degree = None):
+    def __init__(self, type = None):
         print("Initialized a Linear Regression Model")
         self._theta = None
         self._coef = None
         self._type = type
-        self._degree = degree
 
     def fit(self, X, y, type = 'normal', learning_rate = 0.1, num_iterations = 1000, batch_size = 10):
-        #If the user requests a Polynomial Regression
-        if self._type == 'polynomial':
-            #This means that the user only uploaded a 1D vector for X, will add the columns
-            degree = self._degree
-            X = X.flatten()
-            X_poly = np.column_stack([X**i for i in range(1, degree + 1)])
-            X = X_poly
-
         #Normalizing my X data and flattening my y
         X_mean, X_std = X.mean(), X.std()
         X = (X - X_mean) / X_std
@@ -90,6 +81,7 @@ class LinearRegression:
                 #Calculating MSE
                 J = (X_minibatch @ theta) - y_minibatch
                 cost_history[i] = np.mean(J**2)
+
                 #Calculating the Gradient
                 gradients = (1 / batch_size) * (X_minibatch.T @ J)
 
@@ -144,13 +136,6 @@ class LinearRegression:
         self._theta = theta_unscaled
 
     def predict(self, X): 
-        if self._type == 'polynomial':
-            #This means that the user only uploaded a 1D vector for X, will add the columns
-            degree = self._degree
-            X = X.flatten()
-            X_poly = np.column_stack([X**i for i in range(1, degree + 1)])
-            X = X_poly
-
         X = (X - X.mean()) - X.std()
         X_new = np.c_[np.ones(X.shape[0]), X]
         theta = self._theta
