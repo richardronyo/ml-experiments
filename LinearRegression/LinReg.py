@@ -58,7 +58,7 @@ class LinearRegression:
 
                 #Calculating the Gradient
                 m = X_new.shape[0]
-                gradients = (1 / m) * (J @ X_new)
+                gradients = (1 / m) * (X_new.T @ J)
 
                 theta -= learning_rate * gradients
 
@@ -91,7 +91,7 @@ class LinearRegression:
                 J = (X_minibatch @ theta) - y_minibatch
                 cost_history[i] = np.mean(J**2)
                 #Calculating the Gradient
-                gradients = (1 / batch_size) * (J @ X_minibatch)
+                gradients = (1 / batch_size) * (X_minibatch.T @ J)
 
                 theta -= learning_rate * gradients
 
