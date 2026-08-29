@@ -131,7 +131,6 @@ class LinearRegression:
         self._theta = theta_unscaled
 
     def predict(self, X): 
-        X = (X - X.mean()) - X.std()
         X_new = np.c_[np.ones(X.shape[0]), X]
         theta = self._theta
 
