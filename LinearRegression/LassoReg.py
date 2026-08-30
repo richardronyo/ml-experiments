@@ -42,7 +42,7 @@ class LassoRegression:
 
             vectorize_sign = np.vectorize(sign)
             m = X_new.shape[0]
-            gradients = (1 / m) * (X.T @ J) + self._alpha * vectorize_sign(theta)
+            gradients = (1 / m) * (X_new.T @ J) + self._alpha * vectorize_sign(theta)
 
             theta -= learning_rate * gradients
 
@@ -63,7 +63,7 @@ class LassoRegression:
         self._theta = theta_unscaled
 
     def predict(self, X):
-        X_new = np.c_[np.ones(X.shape[0], X)]
+        X_new = np.c_[np.ones(X.shape[0]), X]
         theta = self._theta
 
         return X_new @ theta
