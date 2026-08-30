@@ -36,7 +36,7 @@ class ElasticRegression:
             theta_history[i, :] = theta
 
             J = (X_new @ theta) - y
-            cost = np.mean(J**2) + (self._l1_ratio * learning_rate * np.linalg.norm(theta, ord = 1)) + (((1 - self._l1_ratio) / 2) * learning_rate * (theta.T @ theta))
+            cost = np.mean(J**2) + (self._l1_ratio * self._alpha * np.linalg.norm(theta, ord = 1)) + (((1 - self._l1_ratio) / 2) * self._alpha * (theta.T @ theta))
             cost_history[i] = cost
 
             vectorized_sign = np.vectorize(sign)
@@ -44,7 +44,7 @@ class ElasticRegression:
             ridge_v = 2*theta
 
             m = X_new.shape[0]
-            gradients = (1 / m) *(X.T @ J) + (self._l1_ratio * lasso_v) + (((1 - self._l1_ratio) / 2) * ridge_v)
+            gradients = (1 / m) * (X_new.T @ J) + (self._alpha * self._l1_ratio * lasso_v) + (self._alpha * ((1 - self._l1_ratio) / 2) * ridge_v)
 
             theta -= learning_rate * gradients
 
