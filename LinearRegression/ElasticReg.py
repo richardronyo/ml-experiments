@@ -21,7 +21,7 @@ class ElasticRegression:
         if len(X_scaled.shape) == 1:
             X_new = np.c_[np.ones(X_scaled.shape), X_scaled] 
         else:
-            X_new = np.c_[np.ones(X_scaled.shape[1]), X_scaled] 
+            X_new = np.c_[np.ones(X_scaled.shape[0]), X_scaled] 
 
         y = y.flatten()
 

@@ -17,7 +17,7 @@ class RidgeRegresion:
         if len(X.shape) == 1:
             X_new = np.c_[np.ones(X.shape), X]
         else:
-            X_new = np.c_[np.ones(X.shape[1]), X]
+            X_new = np.c_[np.ones(X.shape[0]), X]
 
         if self._type == 'normal':
             A = X_new.T @ X_new
