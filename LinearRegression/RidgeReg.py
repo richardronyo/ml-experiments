@@ -20,7 +20,7 @@ class RidgeRegresion:
             X_new = np.c_[np.ones(X.shape[1]), X]
 
         if self._type == 'normal':
-            A = X_new.T @ X
+            A = X_new.T @ X_new
             theta = np.linalg.inv(A + (self._alpha * np.identity(A.shape[0]))) @ X_new.T @ y
 
         if self._type == 'stochastic':
