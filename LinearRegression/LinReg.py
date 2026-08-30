@@ -44,7 +44,7 @@ class LinearRegression:
 
                 #Calculating the Gradient
                 m = X_new.shape[0]
-                gradients = (1 / m) * (X_new.T @ J)
+                gradients = (2 / m) * (X_new.T @ J)
 
                 theta -= learning_rate * gradients
 
