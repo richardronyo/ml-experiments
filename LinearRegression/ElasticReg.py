@@ -65,7 +65,7 @@ class ElasticRegression:
         self._theta = theta_unscaled
 
     def predict(self, X):
-        X_new = np.c_[np.ones(X.shape[0], X)]
+        X_new = np.c_[np.ones(X.shape[0]), X]
         theta = self._theta
 
         return X_new @ theta
