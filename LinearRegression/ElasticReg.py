@@ -15,7 +15,7 @@ class ElasticRegression:
 
     def fit(self, X, y, learning_rate = 0.01, num_iterations = 1000):
         #Scaling X and appending bias term
-        X_mean, X_std = X.mean(), X.std()
+        X_mean, X_std = X.mean(axis=0), X.std(axis=0) 
         X_scaled = (X - X_mean) / X_std
 
         if len(X_scaled.shape) == 1:

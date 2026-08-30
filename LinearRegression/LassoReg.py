@@ -15,7 +15,7 @@ class LassoRegression:
 
     def fit(self, X, y, learning_rate = 0.01, num_iterations = 1000):
         #Normalizing and appending bias term to X
-        X_mean, X_std = X.mean(), X.std()
+        X_mean, X_std = X.mean(axis=0), X.std(axis=0) 
         X = (X - X_mean) / X_std
 
         if len(X.shape) == 1:

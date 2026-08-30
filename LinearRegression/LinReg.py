@@ -9,7 +9,7 @@ class LinearRegression:
 
     def fit(self, X, y, type = 'normal', learning_rate = 0.1, num_iterations = 1000, batch_size = 10):
         #Normalizing my X data and flattening my y
-        X_mean, X_std = X.mean(), X.std()
+        X_mean, X_std = X.mean(axis=0), X.std(axis=0)
         X = (X - X_mean) / X_std
         y = y.flatten()
 
