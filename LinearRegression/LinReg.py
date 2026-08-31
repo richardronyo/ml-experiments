@@ -18,13 +18,13 @@ class LinearRegression:
             X_new = np.c_[np.ones(X.shape[0]), X]
             theta = np.linalg.inv(X_new.T @ X_new) @ X_new.T @ y
 
-        if type == 'pseudoinverse':
+        elif type == 'pseudoinverse':
             #Appending a column of 1s to the X for matrix multiplication
             X_new = np.c_[np.ones(X.shape[0]), X]
 
             theta = np.linalg.pinv(X_new) @ y
 
-        if type == 'batch':
+        elif type == 'batch':
             #Appending a column of 1s to the X for matrix multiplication
             X_new = np.c_[np.ones(X.shape[0]), X]
 
@@ -54,7 +54,8 @@ class LinearRegression:
 
             self._theta_history = theta_history_unscaled            
             self._cost_history = cost_history
-        if type == 'minibatch':
+
+        elif type == 'minibatch':
             #Appending a column of 1s to the X for matrix multiplication
             X_new = np.c_[np.ones(X.shape[0]), X]
 
@@ -89,7 +90,7 @@ class LinearRegression:
             self._theta_history = theta_history_unscaled            
             self._cost_history = cost_history
 
-        if type == 'stochastic':
+        elif type == 'stochastic':
             m = X.shape[0]
 
             #Appending a column of 1s to X for the bias term
@@ -115,7 +116,6 @@ class LinearRegression:
 
                 theta -= learning_rate * gradient
 
-
             theta_history_unscaled = np.zeros_like(theta_history)
             theta_history_unscaled[:, 1:] = theta_history[:, 1:] / X_std
             theta_history_unscaled[:, 0] = theta_history[:, 0] - np.sum(theta_history[:, 1:] * X_mean / X_std, axis = 1)
@@ -123,11 +123,14 @@ class LinearRegression:
             self._theta_history = theta_history_unscaled            
             self._cost_history = cost_history
 
+        else:
+            raise(ValueError(f'Unknown fit type: {type}'))
+
         #Unscaling theta values to be stored
         theta_unscaled = np.zeros_like(theta)
         theta_unscaled[1:] = theta[1:] / X_std
         theta_unscaled[0] = theta[0] - np.sum(theta[1:] * X_mean / X_std)
-
+        print(theta_unscaled)
         self._theta = theta_unscaled
 
     def predict(self, X): 
@@ -136,10 +139,12 @@ class LinearRegression:
 
         return X_new @ theta
 
+from sklearn.linear_model import LinearRegression as LR_SK
 if __name__ == "__main__":
     X = np.random.rand(100, 1)
     y = 4 + 3 * X * np.random.rand(100, 1)
 
+    lr_sk = LR_SK()
     lin_reg = LinearRegression()
 
     lin_reg.fit(X, y)
@@ -161,3 +166,8 @@ if __name__ == "__main__":
     lin_reg.fit(X, y, type = 'minibatch')
     print("Mini Batch Gradient Descent: ")
     print("\tTheta: ", lin_reg._theta)
+
+    lr_sk.fit(X, y)
+    print('Scikit-Learn Implementation: ')
+    print('\tIntercept: ', lr_sk.intercept_)
+    print('\tCoefficients: ', lr_sk.coef_)

@@ -1,6 +1,6 @@
 import numpy as np
 
-class RidgeRegresion:
+class RidgeRegression:
     def __init__(self, alpha = 0.1, type = 'stochastic'):
         self._alpha = alpha
         self._type = type
